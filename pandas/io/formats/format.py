@@ -948,12 +948,18 @@ class GenericArrayFormatter(object):
         is_float_type = lib.map_infer(vals, is_float) & notna(vals)
         leading_space = is_float_type.any()
 
+        adj = _get_adjustment()
+        conf_max = get_option("display.max_colwidth")
+
         fmt_values = []
         for i, v in enumerate(vals):
             if not is_float_type[i] and leading_space:
                 fmt_values.append(u' {v}'.format(v=_format(v)))
             elif is_float_type[i]:
                 fmt_values.append(float_format(v))
+            elif conf_max is not None and (type(v) is compat.binary_type
+                                           or type(v) is compat.text_type):
+                fmt_values.append(u' {v}'.format(v=_format(v[:conf_max*5])))
             else:
                 fmt_values.append(u' {v}'.format(v=_format(v)))
 
