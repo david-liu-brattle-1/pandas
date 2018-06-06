@@ -4,7 +4,7 @@ import warnings
 import numpy as np
 import pandas.util.testing as tm
 from pandas import (DataFrame, Series, MultiIndex, date_range, period_range,
-                    isnull, NaT)
+                    isnull, NaT, option_context)
 
 from .pandas_vb_common import setup  # noqa
 
@@ -150,6 +150,7 @@ class Repr(object):
         self.df4 = DataFrame(data, index=np.random.randn(nrows))
         self.df_tall = DataFrame(np.random.randn(nrows, 10))
         self.df_wide = DataFrame(np.random.randn(10, nrows))
+        self.df_long_strings = DataFrame([['A'*20000]*10]*nrows)
 
     def time_html_repr_trunc_mi(self):
         self.df3._repr_html_()
@@ -158,11 +159,16 @@ class Repr(object):
         self.df4._repr_html_()
 
     def time_repr_tall(self):
-        repr(self.df_tall)
+        with option_context('display.max_columns',None):
+            repr(self.df_tall)
 
     def time_frame_repr_wide(self):
-        repr(self.df_wide)
+        with option_context('display.max_columns',None):
+            repr(self.df_wide)
 
+    def time_frame_long_strings(self):
+        with option_context('display.max_columns',None):
+            repr(self.df_long_strings)
 
 class MaskBool(object):
 
